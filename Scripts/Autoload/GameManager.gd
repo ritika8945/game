@@ -120,6 +120,7 @@ func restart_level():
 func go_to_main_menu():
 	is_paused = false
 	get_tree().paused = false
+	VoiceManager.stop_bg_music()
 	get_tree().change_scene_to_file("res://Scenes/UI/MainMenu.tscn")
 
 func toggle_pause():

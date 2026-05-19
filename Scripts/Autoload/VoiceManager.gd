@@ -122,16 +122,7 @@ func get_voice_stream(category: int) -> AudioStream:
 
 func _load_audio_stream(path: String) -> AudioStream:
 	if path.ends_with(".wav"):
-		var file = FileAccess.open(path, FileAccess.READ)
-		if file:
-			var data = file.get_buffer(file.get_length())
-			file.close()
-			var stream = AudioStreamWAV.new()
-			stream.data = data
-			stream.format = AudioStreamWAV.FORMAT_16_BITS
-			stream.mix_rate = 44100
-			stream.stereo = true
-			return stream
+		return _parse_wav_file(path)
 	elif path.ends_with(".mp3"):
 		var file = FileAccess.open(path, FileAccess.READ)
 		if file:
@@ -227,3 +218,67 @@ func get_category_display_name(category: int) -> String:
 
 func get_voice_path_for_category(category: int) -> String:
 	return voice_assignments.get(category, "")
+
+func _parse_wav_file(path: String) -> AudioStream:
+	var file = FileAccess.open(path, FileAccess.READ)
+	if not file:
+		return null
+	var file_size = file.get_length()
+	if file_size < 44:
+		file.close()
+		return null
+
+	# Read RIFF header
+	var riff = file.get_buffer(4)
+	if riff[0] != 0x52 or riff[1] != 0x49 or riff[2] != 0x46 or riff[3] != 0x46:
+		file.close()
+		return null
+	file.get_32() # chunk size
+	file.get_buffer(4) # WAVE
+
+	# Parse chunks to find fmt and data
+	var num_channels: int = 2
+	var sample_rate: int = 44100
+	var bits_per_sample: int = 16
+	var audio_data: PackedByteArray = PackedByteArray()
+
+	while file.get_position() < file_size - 8:
+		var chunk_id = file.get_buffer(4)
+		var chunk_size = file.get_32()
+		var chunk_id_str = char(chunk_id[0]) + char(chunk_id[1]) + char(chunk_id[2]) + char(chunk_id[3])
+
+		if chunk_id_str == "fmt ":
+			var audio_format = file.get_16()
+			num_channels = file.get_16()
+			sample_rate = file.get_32()
+			file.get_32() # byte rate
+			file.get_16() # block align
+			bits_per_sample = file.get_16()
+			var remaining = chunk_size - 16
+			if remaining > 0:
+				file.get_buffer(remaining)
+		elif chunk_id_str == "data":
+			audio_data = file.get_buffer(chunk_size)
+		else:
+			if chunk_size > 0:
+				file.get_buffer(chunk_size)
+
+	file.close()
+
+	if audio_data.size() == 0:
+		return null
+
+	var stream = AudioStreamWAV.new()
+	stream.data = audio_data
+	stream.mix_rate = sample_rate
+	stream.stereo = num_channels >= 2
+
+	match bits_per_sample:
+		8:
+			stream.format = AudioStreamWAV.FORMAT_8_BITS
+		16:
+			stream.format = AudioStreamWAV.FORMAT_16_BITS
+		_:
+			stream.format = AudioStreamWAV.FORMAT_16_BITS
+
+	return stream
