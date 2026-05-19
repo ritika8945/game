@@ -58,6 +58,40 @@ fi
 
 echo -e "${GREEN}[1/5]${NC} Using Godot: $GODOT_BIN"
 
+# Helper: run Godot headless with a timeout to prevent hangs.
+# Godot loads project autoloads which may print warnings — that's normal.
+run_godot() {
+    local description="$1"
+    shift
+    local timeout_secs="${GODOT_TIMEOUT:-120}"
+
+    if command -v timeout &>/dev/null; then
+        timeout "$timeout_secs" "$GODOT_BIN" --headless "$@" 2>&1 || {
+            local rc=$?
+            # timeout returns 124 on timeout
+            if [ $rc -eq 124 ]; then
+                echo -e "${YELLOW}WARNING: $description timed out after ${timeout_secs}s, continuing...${NC}"
+            fi
+            return 0
+        }
+    else
+        "$GODOT_BIN" --headless "$@" 2>&1 &
+        local pid=$!
+        local waited=0
+        while kill -0 "$pid" 2>/dev/null; do
+            sleep 1
+            waited=$((waited + 1))
+            if [ "$waited" -ge "$timeout_secs" ]; then
+                echo -e "${YELLOW}WARNING: $description timed out after ${timeout_secs}s, continuing...${NC}"
+                kill "$pid" 2>/dev/null || true
+                wait "$pid" 2>/dev/null || true
+                break
+            fi
+        done
+        wait "$pid" 2>/dev/null || true
+    fi
+}
+
 # --- Build Android Plugin ---
 echo -e "${GREEN}[2/5]${NC} Building Android plugin (ML Kit + audio picker)..."
 cd "$PROJECT_DIR/android-plugin"
@@ -82,12 +116,16 @@ cp android-plugin/plugin/export_scripts_template/* addons/FaceRunPlugin/
 # --- Install Android build template if not present ---
 echo -e "${GREEN}[4/5]${NC} Setting up Android build template..."
 if [ ! -d "$PROJECT_DIR/android/build" ]; then
-    "$GODOT_BIN" --headless --install-android-build-template 2>/dev/null || true
+    run_godot "Install Android build template" --quit --install-android-build-template
+    echo -e "  Android build template installed."
+else
+    echo -e "  Android build template already exists, skipping."
 fi
 
 # --- Export APK ---
 echo -e "${GREEN}[5/5]${NC} Exporting debug APK..."
-"$GODOT_BIN" --headless --export-debug "Android Debug" "$OUTPUT_APK"
+rm -f "$OUTPUT_APK"
+run_godot "Export APK" --quit --export-debug "Android Debug" "$OUTPUT_APK"
 
 if [ -f "$OUTPUT_APK" ]; then
     echo ""
@@ -95,10 +133,24 @@ if [ -f "$OUTPUT_APK" ]; then
     echo -e "${GREEN} BUILD SUCCESSFUL${NC}"
     echo -e "${GREEN}========================================${NC}"
     echo -e "APK: ${YELLOW}$OUTPUT_APK${NC}"
+    APK_SIZE=$(du -h "$OUTPUT_APK" | cut -f1)
+    echo -e "Size: ${YELLOW}$APK_SIZE${NC}"
     echo ""
     echo "Install on phone:"
     echo "  adb install $OUTPUT_APK"
 else
-    echo -e "${RED}Build failed. Check Godot export template installation.${NC}"
+    echo ""
+    echo -e "${RED}========================================${NC}"
+    echo -e "${RED} BUILD FAILED${NC}"
+    echo -e "${RED}========================================${NC}"
+    echo ""
+    echo "Common fixes:"
+    echo "  1. Install Android export templates in Godot:"
+    echo "     Editor → Manage Export Templates → Download"
+    echo "  2. Make sure Android SDK is installed and ANDROID_HOME is set"
+    echo "  3. Try running manually in Godot: Project → Export → Android Debug"
+    echo ""
+    echo "For debug output, run:"
+    echo "  $GODOT_BIN --headless --export-debug \"Android Debug\" $OUTPUT_APK"
     exit 1
 fi
