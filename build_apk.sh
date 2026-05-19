@@ -22,6 +22,7 @@ cd "$PROJECT_DIR"
 OUTPUT_APK="$PROJECT_DIR/FaceRunOffline-debug.apk"
 
 # --- Detect Godot binary ---
+if [ -z "${GODOT_BIN:-}" ]; then
 GODOT_BIN=""
 for cmd in godot godot4 "Godot_v4" godot-mono; do
     if command -v "$cmd" &>/dev/null; then
@@ -43,6 +44,7 @@ if [ -z "$GODOT_BIN" ]; then
             break
         fi
     done
+fi
 fi
 
 if [ -z "$GODOT_BIN" ]; then
