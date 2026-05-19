@@ -1,0 +1,51 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Enemies/flying_bug.gd" id="1"]
+[ext_resource type="Texture2D" path="res://Assets/Spritesheet/platformPack_tilesheet.png" id="2"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bug1"]
+atlas = ExtResource("2")
+region = Rect2(64, 384, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bug"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bug1")
+}],
+"loop": true,
+"name": &"Fly",
+"speed": 8.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bug"]
+size = Vector2(40, 40)
+
+[node name="FlyingBug" type="CharacterBody2D" groups=["Enemies"]]
+script = ExtResource("1")
+move_speed = 60.0
+health = 1
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -20)
+scale = Vector2(0.7, 0.7)
+sprite_frames = SubResource("SpriteFrames_bug")
+animation = &"Fly"
+autoplay = "Fly"
+
+[node name="FaceSprite" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(0, -24)
+scale = Vector2(0.25, 0.25)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_bug")
+
+[node name="Hitbox" type="Area2D" parent="."]
+
+[node name="HitboxShape" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_bug")
+
+[connection signal="body_entered" from="Hitbox" to="." method="_on_hitbox_body_entered"]

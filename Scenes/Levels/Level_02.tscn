@@ -1,0 +1,131 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Prefabs/LevelFinishDoor.tscn" id="1_door"]
+[ext_resource type="PackedScene" path="res://Scenes/Prefabs/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://Scenes/Prefabs/Collectibles/Gem.tscn" id="3_gem"]
+[ext_resource type="PackedScene" path="res://Scenes/Prefabs/Enemies/SlimeBot.tscn" id="4_slime"]
+[ext_resource type="PackedScene" path="res://Scenes/Prefabs/Enemies/FlyingBug.tscn" id="5_bug"]
+[ext_resource type="PackedScene" path="res://Scenes/Prefabs/Collectibles/Checkpoint.tscn" id="6_cp"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/GameUI.tscn" id="7_ui"]
+[ext_resource type="Texture2D" path="res://Assets/Spritesheet/platformPack_tilesheet.png" id="8_tiles"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ground"]
+texture = ExtResource("8_tiles")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, 32, 32, 32, 32, -32, -32, -32)
+0:2/0 = 0
+0:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 16, -32, 16)
+0:2/0/physics_layer_0/polygon_0/one_way = true
+4:0/0 = 0
+4:1/0 = 0
+5:0/0 = 0
+5:1/0 = 0
+3:0/0 = 0
+3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
+
+[sub_resource type="TileSet" id="TileSet_level2"]
+tile_size = Vector2i(64, 64)
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_ground")
+
+[node name="Level_02" type="Node2D"]
+
+[node name="LevelLabel" type="Label" parent="."]
+offset_left = 50.0
+offset_top = 10.0
+offset_right = 350.0
+offset_bottom = 40.0
+text = "World 2: Jungle Ruins"
+
+[node name="Background" type="ColorRect" parent="."]
+z_index = -10
+offset_left = -500.0
+offset_top = -500.0
+offset_right = 3500.0
+offset_bottom = 1000.0
+color = Color(0.1, 0.25, 0.12, 1)
+
+[node name="LevelFinishDoor" parent="." instance=ExtResource("1_door")]
+z_index = 1
+position = Vector2(2800, 336)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+z_index = 1
+position = Vector2(150, 380)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position = Vector2(16, 36)
+limit_left = 0
+limit_bottom = 705
+limit_smoothed = true
+position_smoothing_enabled = true
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+
+[node name="Gems" type="Node2D" parent="."]
+
+[node name="Gem1" parent="Gems" instance=ExtResource("3_gem")]
+position = Vector2(350, 350)
+
+[node name="Gem2" parent="Gems" instance=ExtResource("3_gem")]
+position = Vector2(550, 280)
+
+[node name="Gem3" parent="Gems" instance=ExtResource("3_gem")]
+position = Vector2(750, 350)
+
+[node name="Gem4" parent="Gems" instance=ExtResource("3_gem")]
+position = Vector2(1050, 250)
+
+[node name="Gem5" parent="Gems" instance=ExtResource("3_gem")]
+position = Vector2(1350, 320)
+
+[node name="Gem6" parent="Gems" instance=ExtResource("3_gem")]
+position = Vector2(1700, 290)
+
+[node name="Gem7" parent="Gems" instance=ExtResource("3_gem")]
+position = Vector2(2000, 350)
+
+[node name="Gem8" parent="Gems" instance=ExtResource("3_gem")]
+position = Vector2(2300, 300)
+
+[node name="Gem9" parent="Gems" instance=ExtResource("3_gem")]
+position = Vector2(2550, 350)
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="SlimeBot1" parent="Enemies" instance=ExtResource("4_slime")]
+position = Vector2(600, 400)
+
+[node name="SlimeBot2" parent="Enemies" instance=ExtResource("4_slime")]
+position = Vector2(1200, 400)
+
+[node name="SlimeBot3" parent="Enemies" instance=ExtResource("4_slime")]
+position = Vector2(2100, 400)
+
+[node name="FlyingBug1" parent="Enemies" instance=ExtResource("5_bug")]
+position = Vector2(900, 280)
+
+[node name="FlyingBug2" parent="Enemies" instance=ExtResource("5_bug")]
+position = Vector2(1800, 260)
+
+[node name="Checkpoints" type="Node2D" parent="."]
+
+[node name="Checkpoint1" parent="Checkpoints" instance=ExtResource("6_cp")]
+position = Vector2(1000, 400)
+
+[node name="Checkpoint2" parent="Checkpoints" instance=ExtResource("6_cp")]
+position = Vector2(1900, 400)
+
+[node name="Level" type="Node2D" parent="."]
+
+[node name="Ground" type="TileMapLayer" parent="Level"]
+use_parent_material = true
+tile_map_data = PackedByteArray("AAAAAAcAAAAAAAAAAAABAAcAAAAAAAAAAAACAAcAAAAAAAAAAAADAAcAAAAAAAAAAAAEAAcAAAAAAAAAAAAFAAcAAAAAAAAAAAAGAAcAAAAAAAAAAAAHAAcAAAAAAAAAAAAIAAcAAAAAAAAAAAAJAAcAAAAAAAAAAAAKAAcAAAAAAAAAAAALAAcAAAAAAAAAAAAMAAcAAAAAAAAAAAANAAcAAAAAAAAAAAAOAAcAAAAAAAAAAAAPAAcAAAAAAAAAAAAQAAcAAAAAAAAAAAARAAcAAAAAAAAAAAASAAcAAAAAAAAAAAATAAcAAAAAAAAAAAAUAAcAAAAAAAAAAAAVAAcAAAAAAAAAAAAWAAcAAAAAAAAAAAAXAAcAAAAAAAAAAAAYAAcAAAAAAAAAAAAZAAcAAAAAAAAAAAAaAAcAAAAAAAAAAAAbAAcAAAAAAAAAAAAcAAcAAAAAAAAAAAAdAAcAAAAAAAAAAAAeAAcAAAAAAAAAAAAfAAcAAAAAAAAAAAAgAAcAAAAAAAAAAAAhAAcAAAAAAAAAAAAiAAcAAAAAAAAAAAAjAAcAAAAAAAAAAAAkAAcAAAAAAAAAAAAlAAcAAAAAAAAAAAAmAAcAAAAAAAAAAAAnAAcAAAAAAAAAAAAoAAcAAAAAAAAAAAApAAcAAAAAAAAAAAAqAAcAAAAAAAAAAAArAAcAAAAAAAAAAAAsAAcAAAAAAAAAAAA")
+tile_set = SubResource("TileSet_level2")
+
+[node name="SpawnPoint" type="Marker2D" parent="Level"]
+unique_name_in_owner = true
+position = Vector2(150, 383)
+
+[node name="GameUI" parent="." instance=ExtResource("7_ui")]
