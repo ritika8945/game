@@ -128,21 +128,34 @@ The plugin bridges Godot with Android native APIs:
 
 ## Build Instructions
 
-### Prerequisites
-- [Godot 4.4+](https://godotengine.org/download) with Android export templates
-- [Android Studio](https://developer.android.com/studio) (for plugin build)
-- Android SDK (API 24+)
-- Java 17+
+### Quick Build (One Command)
 
-### Step 1: Build the Android Plugin
+```bash
+git clone https://github.com/ritika8945/game.git
+cd game
+./build_apk.sh
+```
+
+That's it! The script builds the Android plugin, copies everything into place, and exports the APK. Output: `FaceRunOffline-debug.apk`
+
+Install on phone: `adb install FaceRunOffline-debug.apk`
+
+> **Prerequisites:** [Godot 4.4+](https://godotengine.org/download) (with Android export templates), Android SDK (API 24+), Java 17+
+>
+> If Godot isn't in your PATH, set it: `GODOT_BIN=/path/to/godot ./build_apk.sh`
+
+### Manual Build (Step by Step)
+
+<details>
+<summary>Click to expand manual steps</summary>
+
+#### Step 1: Build the Android Plugin
 ```bash
 cd android-plugin
 ./gradlew assemble
 ```
-This produces `FaceRunPlugin-debug.aar` and `FaceRunPlugin-release.aar`.
 
-### Step 2: Install Plugin in Godot Project
-Copy the built AAR files to the Godot project addons:
+#### Step 2: Install Plugin in Godot Project
 ```bash
 mkdir -p addons/FaceRunPlugin/bin/debug addons/FaceRunPlugin/bin/release
 cp android-plugin/plugin/build/outputs/aar/FaceRunPlugin-debug.aar addons/FaceRunPlugin/bin/debug/
@@ -150,27 +163,26 @@ cp android-plugin/plugin/build/outputs/aar/FaceRunPlugin-release.aar addons/Face
 cp android-plugin/plugin/export_scripts_template/* addons/FaceRunPlugin/
 ```
 
-### Step 3: Open in Godot
+#### Step 3: Open in Godot
 1. Open `project.godot` in Godot 4.4+
 2. Go to Project → Project Settings → Plugins → Enable FaceRunPlugin
 3. Install Android Build Template: Project → Install Android Build Template
 
-### Step 4: Export APK
+#### Step 4: Export APK
 1. Go to Project → Export
 2. Select "Android Debug" preset
 3. Click "Export Project"
 4. Choose output path for `.apk`
 
-### Step 5: Export AAB (Release)
+#### Step 5: Export AAB (Release)
 1. Select "Android Release" preset
 2. Configure signing keystore
 3. Export as `.aab`
 
-### Voice Integration
-The project is structured so you can add voice files before building:
-- Place voice audio files (`.wav` or `.ogg`) in `Assets/Sound/Voice/`
-- Reference them in `AudioManager.tscn` as new AudioStreamPlayer nodes
-- Call them from scripts via `AudioManager.your_voice_sfx.play()`
+</details>
+
+### Voice & Audio
+Users assign voice/audio files from within the app on their phone (Main Menu → Voice & Audio Setup). No need to add audio files before building.
 
 ---
 

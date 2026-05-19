@@ -20,3 +20,8 @@ android-plugin/.gradle/
 android-plugin/plugin/build/
 android-plugin/plugin/demo/
 android-plugin/local.properties
+
+# Build outputs
+*.apk
+*.aab
+android/
