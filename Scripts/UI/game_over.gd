@@ -5,6 +5,7 @@ extends Control
 @onready var main_menu_btn = $VBoxContainer/MainMenuBtn
 
 func _ready():
+	AudioManager.play_game_over()
 	if score_label:
 		score_label.text = "Score: %d" % GameManager.score
 	if retry_btn:

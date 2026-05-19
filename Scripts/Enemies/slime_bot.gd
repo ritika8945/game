@@ -51,6 +51,7 @@ func _patrol():
 
 func take_hit():
 	health -= 1
+	AudioManager.play_enemy_hit()
 	_flash_damage()
 	if health <= 0:
 		die()
@@ -64,6 +65,7 @@ func _flash_damage():
 func die():
 	is_dead = true
 	velocity = Vector2.ZERO
+	AudioManager.play_enemy_death()
 	if sprite:
 		var tween = create_tween()
 		tween.tween_property(sprite, "scale", Vector2.ZERO, 0.2)

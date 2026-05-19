@@ -74,6 +74,8 @@ func _state_patrol(delta):
 func _state_charge(delta):
 	velocity.x = direction * charge_speed
 	charge_timer += delta
+	if charge_timer < 0.1:
+		AudioManager.play_boss_roar()
 
 	if is_on_wall() or charge_timer > 2.0:
 		state = BossState.STUNNED
@@ -115,6 +117,7 @@ func die():
 	is_dead = true
 	state = BossState.DYING
 	velocity = Vector2.ZERO
+	AudioManager.play_boss_death()
 	emit_signal("boss_defeated")
 	GameManager.defeat_enemy()
 	GameManager.add_score(100)

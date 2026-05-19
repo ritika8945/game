@@ -84,6 +84,7 @@ func add_life():
 	emit_signal("lives_changed", lives)
 
 func complete_level():
+	VoiceManager.stop_bg_music()
 	emit_signal("level_completed", current_level)
 	SaveManager.save_level_progress(current_level)
 	if current_level < total_levels:
@@ -97,6 +98,7 @@ func load_level(level_index: int):
 		gems_collected = 0
 		emit_signal("health_changed", health)
 		emit_signal("score_changed", score)
+		VoiceManager.start_bg_music()
 		var scene = load(level_scenes[level_index - 1])
 		if scene:
 			get_tree().change_scene_to_packed(scene)

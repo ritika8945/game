@@ -26,7 +26,9 @@ class FaceRunPlugin(godot: Godot) : GodotPlugin(godot) {
     companion object {
         private const val TAG = "FaceRunPlugin"
         private const val PICK_IMAGE_REQUEST = 9001
+        private const val PICK_AUDIO_REQUEST = 9002
         private const val FACE_DIR = "faces"
+        private const val VOICE_DIR = "voices"
     }
 
     private val faceDetectorOptions = FaceDetectorOptions.Builder()
@@ -47,7 +49,9 @@ class FaceRunPlugin(godot: Godot) : GodotPlugin(godot) {
             SignalInfo("face_cropped", String::class.java),
             SignalInfo("face_detection_failed", String::class.java),
             SignalInfo("no_faces_found"),
-            SignalInfo("plugin_ready")
+            SignalInfo("plugin_ready"),
+            SignalInfo("audio_picked", String::class.java),
+            SignalInfo("audio_pick_failed", String::class.java)
         )
     }
 
@@ -78,6 +82,15 @@ class FaceRunPlugin(godot: Godot) : GodotPlugin(godot) {
                 val path = copyImageToLocal(uri)
                 if (path != null) {
                     emitSignal("image_picked", path)
+                }
+            }
+        } else if (requestCode == PICK_AUDIO_REQUEST && resultCode == Activity.RESULT_OK) {
+            data?.data?.let { uri ->
+                val path = copyAudioToLocal(uri)
+                if (path != null) {
+                    emitSignal("audio_picked", path)
+                } else {
+                    emitSignal("audio_pick_failed", "Could not copy audio file")
                 }
             }
         }
@@ -199,6 +212,65 @@ class FaceRunPlugin(godot: Godot) : GodotPlugin(godot) {
     }
 
     @UsedByGodot
+    fun pickAudioFromDevice() {
+        runOnHostThread {
+            try {
+                val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                    type = "audio/*"
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("audio/mpeg", "audio/wav", "audio/x-wav", "audio/ogg"))
+                }
+                activity?.startActivityForResult(
+                    Intent.createChooser(intent, "Select Audio File"),
+                    PICK_AUDIO_REQUEST
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to open audio picker: ${e.message}")
+                emitSignal("audio_pick_failed", e.message ?: "Unknown error")
+            }
+        }
+    }
+
+    @UsedByGodot
+    fun saveVoiceAssignment(category: String, audioPath: String) {
+        try {
+            val prefs = activity?.getSharedPreferences("voice_assignments", Activity.MODE_PRIVATE)
+            prefs?.edit()?.putString(category, audioPath)?.apply()
+            Log.i(TAG, "Voice assigned: $category -> $audioPath")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error saving voice assignment: ${e.message}")
+        }
+    }
+
+    @UsedByGodot
+    fun getSavedVoiceAssignments(): String {
+        return try {
+            val prefs = activity?.getSharedPreferences("voice_assignments", Activity.MODE_PRIVATE)
+            val json = JSONObject()
+            prefs?.all?.forEach { (key, value) ->
+                json.put(key, value.toString())
+            }
+            json.toString()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting voice assignments: ${e.message}")
+            "{}"
+        }
+    }
+
+    @UsedByGodot
+    fun deleteAllVoiceData() {
+        try {
+            val voicesDir = getVoicesDirectory()
+            voicesDir.listFiles()?.forEach { it.delete() }
+            val prefs = activity?.getSharedPreferences("voice_assignments", Activity.MODE_PRIVATE)
+            prefs?.edit()?.clear()?.apply()
+            Log.i(TAG, "All voice data deleted")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error deleting voice data: ${e.message}")
+        }
+    }
+
+    @UsedByGodot
     fun isPluginReady(): Boolean = true
 
     private fun copyImageToLocal(uri: Uri): String? {
@@ -275,13 +347,45 @@ class FaceRunPlugin(godot: Godot) : GodotPlugin(godot) {
         return inSampleSize
     }
 
+    private fun copyAudioToLocal(uri: Uri): String? {
+        return try {
+            val inputStream = activity?.contentResolver?.openInputStream(uri) ?: return null
+            val mimeType = activity?.contentResolver?.getType(uri)
+            val ext = when {
+                mimeType?.contains("mpeg") == true -> "mp3"
+                mimeType?.contains("wav") == true -> "wav"
+                mimeType?.contains("ogg") == true -> "ogg"
+                else -> "mp3"
+            }
+            val outputFile = getVoiceFile("audio_${System.currentTimeMillis()}.$ext")
+            val outputStream = FileOutputStream(outputFile)
+            inputStream.copyTo(outputStream)
+            inputStream.close()
+            outputStream.close()
+            outputFile.absolutePath
+        } catch (e: Exception) {
+            Log.e(TAG, "Error copying audio: ${e.message}")
+            null
+        }
+    }
+
     private fun getFacesDirectory(): File {
         val dir = File(activity?.filesDir, FACE_DIR)
         if (!dir.exists()) dir.mkdirs()
         return dir
     }
 
+    private fun getVoicesDirectory(): File {
+        val dir = File(activity?.filesDir, VOICE_DIR)
+        if (!dir.exists()) dir.mkdirs()
+        return dir
+    }
+
     private fun getFaceFile(filename: String): File {
         return File(getFacesDirectory(), filename)
+    }
+
+    private fun getVoiceFile(filename: String): File {
+        return File(getVoicesDirectory(), filename)
     }
 }

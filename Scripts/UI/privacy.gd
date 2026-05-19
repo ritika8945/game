@@ -22,6 +22,8 @@ FaceRun Offline is designed to be fully offline. Your data never leaves your dev
 [b]What Data is Stored[/b]
 • Cropped face images (PNG) — stored in app-private local storage
 • Face-to-entity assignments — stored locally
+• Voice/audio files — stored in app-private local storage
+• Voice-to-entity assignments — stored locally
 • Game progress (level, score) — stored locally
 • Settings preferences — stored locally
 
@@ -34,8 +36,9 @@ FaceRun Offline is designed to be fully offline. Your data never leaves your dev
 • No cloud backups
 
 [b]Data Deletion[/b]
-You can delete all face data at any time:
+You can delete all face and voice data at any time:
 • Go to Face Setup → Delete All Face Data
+• Go to Voice & Audio Setup → Delete All Voice Data
 • Or use the button below
 • Uninstalling the app removes all local data
 
@@ -68,16 +71,17 @@ func _ready():
 
 func _on_delete_data():
 	var confirm = ConfirmationDialog.new()
-	confirm.title = "Delete All Face Data"
-	confirm.dialog_text = "This will permanently delete all face images\nstored on your device. Are you sure?"
+	confirm.title = "Delete All Face & Voice Data"
+	confirm.dialog_text = "This will permanently delete all face images\nand voice files stored on your device. Are you sure?"
 	add_child(confirm)
 	confirm.popup_centered()
 	confirm.confirmed.connect(func():
 		FaceManager.delete_all_faces()
+		VoiceManager.delete_all_voices()
 		confirm.queue_free()
 		var info = AcceptDialog.new()
 		info.title = "Done"
-		info.dialog_text = "All face data has been deleted."
+		info.dialog_text = "All face and voice data has been deleted."
 		add_child(info)
 		info.popup_centered()
 		info.confirmed.connect(func(): info.queue_free())

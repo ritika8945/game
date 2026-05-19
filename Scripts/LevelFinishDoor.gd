@@ -6,6 +6,6 @@ extends Area2D
 func _on_body_entered(body):
 	if body.is_in_group("Player"):
 		get_tree().call_group("Player", "level_complete_tween")
-		AudioManager.level_complete_sfx.play()
+		AudioManager.play_level_complete()
 		await get_tree().create_timer(0.5).timeout
 		get_tree().change_scene_to_file("res://Scenes/UI/LevelComplete.tscn")

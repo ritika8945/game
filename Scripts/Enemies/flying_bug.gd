@@ -38,6 +38,7 @@ func _physics_process(delta):
 
 func take_hit():
 	health -= 1
+	AudioManager.play_enemy_hit()
 	if health <= 0:
 		die()
 	else:
@@ -52,6 +53,7 @@ func _flash_damage():
 func die():
 	is_dead = true
 	velocity = Vector2.ZERO
+	AudioManager.play_enemy_death()
 	if sprite:
 		var tween = create_tween()
 		tween.tween_property(self, "scale", Vector2.ZERO, 0.2)
