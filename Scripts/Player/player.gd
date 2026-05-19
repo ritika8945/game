@@ -20,6 +20,7 @@ var jump_buffer_timer: float = 0.0
 var was_on_floor: bool = false
 var touch_input_x: float = 0.0
 var touch_jump_pressed: bool = false
+var is_completing_level: bool = false
 
 @onready var player_sprite = $AnimatedSprite2D
 @onready var spawn_point = %SpawnPoint
@@ -157,7 +158,16 @@ func _damage_flash():
 		tween.tween_property(player_sprite, "modulate:a", 0.3, 0.1)
 		tween.tween_property(player_sprite, "modulate:a", 1.0, 0.1)
 
+func level_complete_tween():
+	is_completing_level = true
+	movement_enabled = false
+	var tween = create_tween()
+	tween.tween_property(player_sprite, "scale", Vector2.ZERO, 0.15)
+	tween.parallel().tween_property(player_sprite, "position", Vector2.ZERO, 0.15)
+
 func death_tween():
+	if is_completing_level:
+		return
 	movement_enabled = false
 	if death_particles:
 		death_particles.emitting = true
@@ -203,10 +213,3 @@ func update_checkpoint(new_spawn: Vector2):
 func _on_collision_body_entered(body):
 	if body.is_in_group("Traps"):
 		take_damage()
-	elif body.is_in_group("Enemies"):
-		if velocity.y > 0 and global_position.y < body.global_position.y:
-			velocity.y = -jump_force * 0.6
-			body.take_hit()
-			GameManager.defeat_enemy()
-		else:
-			take_damage()

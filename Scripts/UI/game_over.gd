@@ -13,8 +13,9 @@ func _ready():
 		main_menu_btn.pressed.connect(_on_main_menu)
 
 func _on_retry():
+	var level_to_retry = GameManager.current_level
 	GameManager.reset_game()
-	GameManager.load_level(GameManager.current_level)
+	GameManager.load_level(level_to_retry)
 
 func _on_main_menu():
 	GameManager.go_to_main_menu()

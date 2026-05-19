@@ -15,7 +15,8 @@ export.cfg
 # Mono-specific ignores
 .mono/
 data_*/
-mono_crash.*.jsonandroid-plugin/.gradle/
+mono_crash.*.json
+android-plugin/.gradle/
 android-plugin/plugin/build/
 android-plugin/plugin/demo/
 android-plugin/local.properties
