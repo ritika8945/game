@@ -68,6 +68,11 @@ layout_mode = 2
 custom_minimum_size = Vector2(280, 50)
 text = "Face Setup"
 
+[node name="VoiceSetupBtn" type="Button" parent="VBoxContainer/ButtonsContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(280, 50)
+text = "Voice & Audio Setup"
+
 [node name="SettingsBtn" type="Button" parent="VBoxContainer/ButtonsContainer"]
 layout_mode = 2
 custom_minimum_size = Vector2(280, 50)

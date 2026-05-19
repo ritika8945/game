@@ -19,6 +19,7 @@ var stun_timer: float = 0.0
 var state_timer: float = 0.0
 var charge_timer: float = 0.0
 var hits_taken: int = 0
+var _roar_played: bool = false
 
 @onready var sprite = $AnimatedSprite2D
 @onready var face_sprite = $FaceSprite
@@ -70,10 +71,14 @@ func _state_patrol(delta):
 		direction = sign(player_ref.global_position.x - global_position.x)
 		state = BossState.CHARGE
 		charge_timer = 0
+		_roar_played = false
 
 func _state_charge(delta):
 	velocity.x = direction * charge_speed
 	charge_timer += delta
+	if not _roar_played:
+		AudioManager.play_boss_roar()
+		_roar_played = true
 
 	if is_on_wall() or charge_timer > 2.0:
 		state = BossState.STUNNED
@@ -115,6 +120,7 @@ func die():
 	is_dead = true
 	state = BossState.DYING
 	velocity = Vector2.ZERO
+	AudioManager.play_boss_death()
 	emit_signal("boss_defeated")
 	GameManager.defeat_enemy()
 	GameManager.add_score(100)

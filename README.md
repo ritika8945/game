@@ -2,7 +2,7 @@
 
 **Your face. Your enemies. Your offline adventure.**
 
-A fully offline retro 2D platformer Android game where users can select photos from their phone, detect/crop faces offline using ML Kit, and assign those faces to game entities like Hero, Enemy, Boss, NPC, and collectibles.
+A fully offline retro 2D platformer Android game where users can select photos from their phone, detect/crop faces offline using ML Kit, and assign those faces to game entities like Hero, Enemy, Boss, NPC, and collectibles. Users can also assign custom voice/audio files (.mp3/.wav) from their device to game events.
 
 ---
 
@@ -26,6 +26,14 @@ A fully offline retro 2D platformer Android game where users can select photos f
 - Preview face on entity before applying
 - Delete all face data with one button
 
+### Voice & Audio Customization
+- Pick `.mp3` or `.wav` files from device for any game sound
+- 10 voice categories: Hero Jump, Hero Damage, Hero Death, Enemy Hit, Enemy Death, Boss Roar, Boss Death, Background Music, Level Complete, Game Over
+- Background music loops continuously during gameplay
+- Preview assigned audio before playing a level
+- Delete all voice data with one button
+- If no custom voice is assigned, default game sounds play
+
 ### Offline-First
 - **No backend, no login, no Firebase, no cloud**
 - All photos and face data stay locally on device
@@ -36,8 +44,9 @@ A fully offline retro 2D platformer Android game where users can select photos f
 ### Privacy
 - "Only use photos you own or have permission to use"
 - "All face images stay on your device"
+- "All voice/audio files stay on your device"
 - "This app detects face location only. It does not identify who the person is."
-- Delete all face data button
+- Delete all face and voice data button
 - Reset customization button
 - Privacy screen with full policy
 

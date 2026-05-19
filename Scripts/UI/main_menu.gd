@@ -5,6 +5,7 @@ extends Control
 @onready var new_game_btn = $VBoxContainer/ButtonsContainer/NewGameBtn
 @onready var continue_btn = $VBoxContainer/ButtonsContainer/ContinueBtn
 @onready var face_setup_btn = $VBoxContainer/ButtonsContainer/FaceSetupBtn
+@onready var voice_setup_btn = $VBoxContainer/ButtonsContainer/VoiceSetupBtn
 @onready var settings_btn = $VBoxContainer/ButtonsContainer/SettingsBtn
 @onready var about_btn = $VBoxContainer/ButtonsContainer/AboutBtn
 @onready var privacy_btn = $VBoxContainer/ButtonsContainer/PrivacyBtn
@@ -22,6 +23,8 @@ func _connect_buttons():
 		continue_btn.pressed.connect(_on_continue)
 	if face_setup_btn:
 		face_setup_btn.pressed.connect(_on_face_setup)
+	if voice_setup_btn:
+		voice_setup_btn.pressed.connect(_on_voice_setup)
 	if settings_btn:
 		settings_btn.pressed.connect(_on_settings)
 	if about_btn:
@@ -53,6 +56,9 @@ func _on_continue():
 
 func _on_face_setup():
 	get_tree().change_scene_to_file("res://Scenes/UI/FaceSetup.tscn")
+
+func _on_voice_setup():
+	get_tree().change_scene_to_file("res://Scenes/UI/VoiceSetup.tscn")
 
 func _on_settings():
 	get_tree().change_scene_to_file("res://Scenes/UI/Settings.tscn")

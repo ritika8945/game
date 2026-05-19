@@ -24,6 +24,7 @@ SceneTransition="*res://Scenes/Managers/SceneTransition.tscn"
 AudioManager="*res://Scenes/Managers/AudioManager.tscn"
 SaveManager="*res://Scripts/Autoload/SaveManager.gd"
 FaceManager="*res://Scripts/Autoload/FaceManager.gd"
+VoiceManager="*res://Scripts/Autoload/VoiceManager.gd"
 
 [display]
 

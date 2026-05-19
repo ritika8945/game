@@ -105,7 +105,7 @@ func handle_jumping():
 
 func jump():
 	jump_tween()
-	AudioManager.jump_sfx.play()
+	AudioManager.play_hero_jump()
 	velocity.y = -jump_force
 
 func player_animations():
@@ -135,7 +135,10 @@ func flip_player():
 func take_damage():
 	if is_invincible:
 		return
-	AudioManager.death_sfx.play()
+	if GameManager.health - 1 <= 0:
+		AudioManager.play_hero_death()
+	else:
+		AudioManager.play_hero_damage()
 	GameManager.take_damage()
 	if GameManager.health <= 0:
 		death_tween()
@@ -185,7 +188,7 @@ func death_tween():
 	movement_enabled = true
 	GameManager.health = GameManager.max_health
 	GameManager.emit_signal("health_changed", GameManager.health)
-	AudioManager.respawn_sfx.play()
+	AudioManager.respawn_sfx.play()  # respawn uses default SFX
 	respawn_tween()
 
 func respawn_tween():
